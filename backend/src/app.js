@@ -18,7 +18,7 @@ app.use(express.json());                    // Permite receber dados em JSON no 
 // Servir arquivos estáticos do frontend
 app.use(express.static(path.join(__dirname, '../../frontend/public')));
 
-// Rota principal ("/") — usada para verificar se a API está rodando
+// Rota principal ('/') — usada para verificar se a API está rodando
 app.get('/', (req, res) => {
     if (!isDbConnected()) {
         return res
@@ -28,6 +28,13 @@ app.get('/', (req, res) => {
 
     res.send('<h1>🚀 Servidor Express Rodando!</h1>');
 });
+
+/** Rotas de Acesso
+    Importa as rotas relacionadas as tabelas    
+    Registra as rotas das tabelas no aplicativo Express.
+*/
+const grupoRoutes = require('./routes/auth/grupoRoutes');
+app.use('/api/grupos', grupoRoutes);
 
 // Rota para teste de conexão com o banco de dados PostgreSQL
 app.get('/db-test', async (req, res, next) => {
