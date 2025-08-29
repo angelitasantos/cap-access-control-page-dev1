@@ -16,7 +16,7 @@ const grupoController = {
             const grupos = await grupoModel.getAll();
             res.status(200).json({ success: true, data: grupos });
         } catch (err) {
-            console.error('Erro em listar grupos:', err);
+            console.error('Erro ao listar grupos:', err);
             res.status(500).json({ success: false, message: 'Erro ao listar grupos!' });
         }
     },
@@ -35,7 +35,7 @@ const grupoController = {
             let { descricao } = req.body;
 
             if (!descricao || typeof descricao !== 'string') {
-                return res.status(400).json({ success: false, message: 'Descrição é obrigatória' });
+                return res.status(400).json({ success: false, message: 'Descrição é obrigatória!' });
             }
             descricao = descricao.trim();
             if (descricao.length < 3) {
@@ -54,8 +54,58 @@ const grupoController = {
             if (err.isDuplicate || err.code === '23505') {
                 return res.status(400).json({ success: false, message: 'Já existe um grupo com essa descrição!' });
             }
-            console.error('Erro em criar grupo:', err);
+            console.error('Erro ao criar grupo:', err);
             return res.status(500).json({ success: false, message: 'Erro ao criar grupo!' });
+        }
+    },
+
+    /**
+     * Atualiza um grupo existente com uma nova descrição.
+     * 
+     * Valida se a descrição possui pelo menos 3 caracteres e verifica se já existe 
+     * outro grupo com a mesma descrição (case-insensitive), desconsiderando o próprio ID.
+     * 
+     * Fluxo:
+     * - Se a descrição for inválida, retorna erro 400.
+     * - Se já existir outro grupo com a mesma descrição, retorna erro 400.
+     * - Se o grupo não for encontrado ou estiver inativo (deletado), retorna erro 404.
+     * - Em caso de sucesso, retorna o grupo atualizado com status 200.
+     * 
+     * Observação:
+     * - Erros inesperados são tratados e respondidos com status 500.
+     * 
+     * @param {import('express').Request} req - Objeto da requisição HTTP.
+     * @param {import('express').Response} res - Objeto da resposta HTTP.
+     * @returns {Promise<void>}
+     */
+    async atualizar(req, res) {
+        try {
+            const { id } = req.params;
+            let { descricao } = req.body;
+
+            if (!descricao || descricao.trim().length < 3) {
+                return res.status(400).json({ success: false, message: 'Descrição deve ter pelo menos 3 caracteres!' });
+            }
+            descricao = descricao.trim();
+
+            const jaExiste = await grupoModel.existsByDescricaoExceptId(descricao, id);
+            if (jaExiste) {
+                return res.status(400).json({ success: false, message: 'Já existe um grupo com essa descrição!' });
+            }
+
+            const atualizado = await grupoModel.update(id, descricao);
+            if (!atualizado) {
+                return res.status(404).json({ success: false, message: 'Grupo não encontrado para atualização!' });
+            }
+
+            return res.status(200).json({ success: true, data: atualizado });
+
+        } catch (err) {
+            if (err.isDuplicate || err.code === '23505') {
+                return res.status(400).json({ success: false, message: 'Já existe um grupo com essa descrição!' });
+            }
+            console.error('Erro ao atualizar grupo:', err);
+            return res.status(500).json({ success: false, message: 'Erro ao atualizar grupo!' });
         }
     }
 
