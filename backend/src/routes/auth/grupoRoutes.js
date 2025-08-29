@@ -19,14 +19,14 @@ router.get('/', grupoController.listar);
 /**
  * @route   POST /
  * @desc    Cria um novo grupo.
- * @access  Público (ou ajustar conforme regras de autenticação)
+ * @access  Público
  * 
  * Quando uma requisição POST for feita para '/api/grupos',
  * o método 'criar' do 'grupoController' será chamado.
  * 
  * Corpo esperado:
  * {
- *   "descricao": "Nome do grupo"
+ *   'descricao': 'Nome do grupo'
  * }
  * 
  * Retorno esperado:
@@ -35,5 +35,33 @@ router.get('/', grupoController.listar);
  * - 500: JSON com mensagem de erro interno.
  */
 router.post('/', grupoController.criar);
+/**
+ * @route   PUT /:id
+ * @desc    Atualiza a descrição de um grupo existente.
+ * @access  Público
+ * 
+ * Quando uma requisição PUT for feita para '/api/grupos/:id',
+ * o método 'atualizar' do 'grupoController' será chamado.
+ * 
+ * Parâmetros de rota:
+ * - id: ID do grupo a ser atualizado.
+ * 
+ * Corpo esperado:
+ * {
+ *   'descricao': 'Nova descrição do grupo'
+ * }
+ * 
+ * Regras:
+ * - A descrição deve ter no mínimo 3 caracteres.
+ * - A nova descrição não pode ser igual à de outro grupo existente (case-insensitive).
+ * - O grupo deve existir e estar ativo (não deletado).
+ * 
+ * Retorno esperado:
+ * - 200: JSON com o grupo atualizado.
+ * - 400: JSON com erros de validação ou duplicidade.
+ * - 404: JSON caso o grupo não seja encontrado.
+ * - 500: JSON com mensagem de erro interno.
+ */
+router.put('/:id', grupoController.atualizar);
 
 module.exports = router;
