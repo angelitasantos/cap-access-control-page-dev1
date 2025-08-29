@@ -90,7 +90,49 @@ const grupoModel = {
             console.error('Erro ao criar grupo:', err.message);
             throw err;
         }
-    }   
+    },
+
+    /**
+     * Verifica se já existe um grupo com a mesma descrição, excetuando um ID específico.
+     * 
+     * Útil em operações de atualização para evitar conflitos de duplicidade com outros registros.
+     * A verificação é case-insensitive e ignora grupos marcados como deletados.
+     * 
+     * @param {string} descricao - Descrição do grupo a ser verificada.
+     * @param {number} id - ID do grupo que deve ser desconsiderado na verificação.
+     * @returns {Promise<boolean>} True se já existir outro grupo com a mesma descrição, false caso contrário.
+     */
+    async existsByDescricaoExceptId(descricao, id) {
+        const result = await db.pool.query(
+            `SELECT id FROM grupos 
+             WHERE descricao ILIKE $1 AND id <> $2`,
+            [descricao, id]
+        );
+        return result.rows.length > 0;
+    },
+
+    /**
+     * Atualiza a descrição de um grupo existente.
+     * 
+     * O grupo é identificado pelo ID fornecido e deve estar ativo (não deletado).
+     * A data de atualização é registrada automaticamente.
+     * 
+     * Retorna o objeto atualizado contendo os campos 'id', 'descricao', 'status', 'created_at' e 'updated_at'.
+     * 
+     * @param {number} id - ID do grupo a ser atualizado.
+     * @param {string} descricao - Nova descrição a ser atribuída ao grupo.
+     * @returns {Promise<Object>} Grupo atualizado.
+     */
+    async update(id, descricao) {
+        const result = await db.pool.query(
+            `UPDATE grupos 
+             SET descricao = $1
+             WHERE id = $2
+             RETURNING id, descricao, status`,
+            [descricao, id]
+        );
+        return result.rows[0];
+    }
 
 }
 

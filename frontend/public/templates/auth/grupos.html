@@ -20,6 +20,7 @@
                         <th style="width: 50px;">ID</th>
                         <th style="min-width: 250px;">Descrição</th>
                         <th style="width: 50px;">Status</th>
+                        <th style="width: 100px;">Ações</th>
                     </tr>
                 </thead>
                 <tbody><!-- Linhas inseridas via JS --></tbody>
@@ -29,7 +30,7 @@
         <div id="modalGrupo" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <span class="close" id="fecharModal">&times;</span>
+                    <span class="close" id="closeModalAdd">&times;</span>
                     <h2>Novo Grupo</h2>
                 </div>
                 
@@ -40,15 +41,43 @@
                                 <label for="descricao" class="label">Descrição</label>
                                 <input type="text" id="descricao" required>
                             </div>
-                        </div>                    
+                        </div>
                         <div class="modal-actions">
                             <button type="submit" class="btn btn-action">Salvar</button>
-                            <button type="button" id="cancelarBtn" class="btn btn-danger">Cancelar</button>
+                            <button type="button" class="btn btn-danger" id="cancelarBtnAdd">Cancelar</button>
                         </div>
                     </div>
                     <div class="modal-footer modal-footer-center">
                         <div>
                             <small id="erroDescricao" class="error-text" aria-live="polite"></small>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="modalEditar" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="close" id="closeModalEdit">&times;</span>
+                    <h2>Editar Grupo</h2>
+                </div>
+                <form id="formEditarGrupo">
+                    <div class="modal-body">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="descricaoEditar">Descrição</label>
+                                <input type="text" id="descricaoEditar" name="descricao" required minlength="3">
+                            </div>
+                        </div>
+                        <div class="modal-actions">
+                            <button type="submit" class="btn btn-action">Salvar Alterações</button>
+                            <button type="button" class="btn btn-danger" id="cancelarBtnEdit">Cancelar</button>
+                        </div>
+                    </div>
+                    <div class="modal-footer modal-footer-center">
+                        <div>
+                            <span id="erroDescricaoEditar" class="error-text" aria-live="polite"></span>
                         </div>
                     </div>
                 </form>
