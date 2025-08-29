@@ -132,6 +132,29 @@ const grupoModel = {
             [descricao, id]
         );
         return result.rows[0];
+    },
+
+    /**
+     * Realiza a exclusão lógica (soft delete) de um grupo.
+     *
+     * Em vez de remover o grupo do banco de dados, esta operação marca o registro como deletado,
+     * alterando o campo `deletado` para `true` e o `status` para `'INATIVO'`.
+     * O grupo permanece na base de dados para fins históricos ou auditoria.
+     *
+     * A exclusão só é aplicada se o grupo ainda não estiver marcado como deletado.
+     *
+     * @param {number} id - Identificador do grupo a ser marcado como deletado.
+     * @returns {Promise<Object>} Objeto com os campos atualizados: 'id', 'descricao', 'status' e 'deletado'.
+     */
+    async softDelete(id) {
+        const result = await db.pool.query(
+            `UPDATE grupos
+            SET deletado = true, status = 'INATIVO'
+            WHERE id = $1 AND deletado = false
+            RETURNING id, descricao, status, deletado`,
+            [id]
+        );
+        return result.rows[0];
     }
 
 }

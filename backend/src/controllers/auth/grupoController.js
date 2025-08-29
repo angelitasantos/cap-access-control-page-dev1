@@ -107,6 +107,43 @@ const grupoController = {
             console.error('Erro ao atualizar grupo:', err);
             return res.status(500).json({ success: false, message: 'Erro ao atualizar grupo!' });
         }
+    },
+
+    /**
+     * Inativa (soft delete) um grupo existente com base no ID informado.
+     *
+     * A operação não remove o grupo do banco de dados, apenas atualiza seu status para 'INATIVO'
+     * e marca o campo 'deletado' como `true`.
+     *
+     * Regras de retorno:
+     * - 404: Se o grupo já estiver inativado ou não for encontrado.
+     * - 200: Grupo inativado com sucesso.
+     * - 500: Em caso de erro interno.
+     *
+     * @param {import('express').Request} req - Requisição HTTP contendo o ID do grupo a ser inativado.
+     * @param {import('express').Response} res - Resposta HTTP com o resultado da operação.
+     * @returns {Promise<void>}
+     */
+    async deletar(req, res) {
+        try {
+            const { id } = req.params;
+
+            const deletado = await grupoModel.softDelete(id);
+
+            if (!deletado) {
+                return res.status(404).json({ success: false, message: 'Grupo não encontrado ou já inativado!' });
+            }
+
+            return res.status(200).json({
+                success: true,
+                message: 'Grupo inativado com sucesso!',
+                data: deletado
+            });
+
+        } catch (err) {
+            console.error('Erro ao inativar grupo:', err);
+            return res.status(500).json({ success: false, message: 'Erro ao inativar grupo!' });
+        }
     }
 
 }
