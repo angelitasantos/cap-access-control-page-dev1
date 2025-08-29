@@ -41,6 +41,7 @@ function renderizarTabela(grupos) {
             <td>${grupo.status}</td>
             <td>
                 <button class='btn btn-warning' onclick='abrirModalEditar(${JSON.stringify(grupo)})'>Editar</button>
+                <button class='btn btn-danger' onclick='inativarGrupo(${grupo.id})'>Inativar</button>
             </td>
         `;
         tbody.appendChild(row);
@@ -176,6 +177,30 @@ formEditarGrupo.addEventListener('submit', async (e) => {
         setErro('Falha na comunicação com o servidor!', formEditarGrupo);
     }
 });
+
+// função para inativar grupo
+async function inativarGrupo(id) {
+    if (!confirm('Tem certeza que deseja inativar este grupo?')) return;
+
+    try {
+        const res = await fetch(`${baseURL}/api/grupos/${id}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            alert('Grupo inativado com sucesso!');
+            carregarGrupos();
+        } else {
+            alert(data.message || 'Erro ao inativar grupo!');
+        }
+    } catch (err) {
+        console.error(err);
+        alert('Erro no servidor ao inativar grupo!');
+    }
+}
 
 /**
     A função 'carregarGrupos' é executada automaticamente quando a página é carregada,
