@@ -4,25 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Listagem de Grupos</title>
+    <link rel="stylesheet" href="../../css/styles.css">
 </head>
 <body>
 
-    <main>
+    <main class="container">
         <section>
             <h1>📋 Lista de Grupos</h1>
-            <table border="1" id="table-group">
+            <button class="btn btn-action" id="btnNovoGrupo">
+                + Novo Grupo
+            </button>
+            <table border="1" id="table-group" class="table table-fixa table-mini">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Descrição</th>
-                        <th>Status</th>
+                        <th style="width: 50px;">ID</th>
+                        <th style="min-width: 250px;">Descrição</th>
+                        <th style="width: 50px;">Status</th>
                     </tr>
                 </thead>
                 <tbody><!-- Linhas inseridas via JS --></tbody>
             </table>
         </section>
+
+        <div id="modalGrupo" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="close" id="fecharModal">&times;</span>
+                    <h2>Novo Grupo</h2>
+                </div>
+                
+                <form id="formGrupo" class="form-container form-mini">
+                    <div class="modal-body">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="descricao" class="label">Descrição</label>
+                                <input type="text" id="descricao" required>
+                            </div>
+                        </div>                    
+                        <div class="modal-actions">
+                            <button type="submit" class="btn btn-action">Salvar</button>
+                            <button type="button" id="cancelarBtn" class="btn btn-danger">Cancelar</button>
+                        </div>
+                    </div>
+                    <div class="modal-footer modal-footer-center">
+                        <div>
+                            <small id="erroDescricao" class="error-text" aria-live="polite"></small>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
     </main>
-    
 
     <script src="../../js/auth/grupos.js"></script>
 </body>

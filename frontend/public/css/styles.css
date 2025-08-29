@@ -1,0 +1,445 @@
+:root {
+  --color-background: #f5f6fa;
+  --color-text: #2f3640;
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  --color-primary-dark: #011121;
+  --color-primary-light: #cfd4d9;
+
+  --color-border: #dee2e6;
+  --color-border-light: #dddddd;
+  --color-table-header-bg: #f3f3f3;
+
+  --color-green: #045504;
+  --color-blue: #0303c2;
+  --color-orange: #b67d14;
+  --color-red: #dc3545;
+
+  --color-form-border: #333333;
+  --color-gray-dark: #212529;
+  --color-gray: #808080;
+  --color-error: #b00020;
+
+  --shadow-light: rgba(0, 0, 0, 0.1);
+  --shadow-medium: rgba(0, 0, 0, 0.3);
+  --overlay-bg: rgba(0, 0, 0, 0.5);
+  --hover-bg: rgba(10, 9, 9, 0.25);
+  --row-alt-bg: rgba(0, 0, 0, 0.02);
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--color-background);
+    color: var(--color-text);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Garantir que o body ocupe toda a altura da tela */
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 2.5rem auto;
+    background: var(--color-white);
+    margin-top: 100px;
+    padding: 1.25rem 2rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 0.25rem 0.75rem var(--shadow-light);
+}
+
+h1 {
+	  margin-bottom: 1.25rem;
+}
+
+/* ========== Modal ========== */
+.modal {
+    display: none;
+    /* escondido por padrão */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* fundo escuro */
+}
+
+.modal-content {
+    background: var(--color-white);
+    width: 90%;
+    max-width: 600px;
+    margin: 8% auto; /* centralizado em telas menores */
+    padding: 1.25rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 1rem var(--shadow-medium);
+    position: relative;
+}
+
+.close {
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+.modal-actions .btn {
+	  margin-left: 0.5rem;
+}
+
+.modal-header {
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #eeeeee;
+}
+
+.modal-header h2 {
+    margin-bottom: 0.25rem;
+}
+
+.modal-body {
+    padding: 1rem 0;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    margin-top: 1rem;
+    border-top: 1px solid #eeeeee;
+}
+
+.modal-footer-center {
+    justify-content: center;
+}
+
+.modal-footer-end {
+    justify-content: flex-end;
+}
+
+/* ========== Tabela ========== */
+.table {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 1rem;
+    color: var(--color-gray-dark);
+    border-collapse: collapse;
+    border: 1px solid var(--color-border);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 0.75rem;
+    box-shadow: 0 0.5rem 0.5rem rgba(0, 0, 0, 0.75);
+}
+
+.table thead th, .table-mini thead th {
+    vertical-align: bottom;
+    border-bottom: 2px solid var(--color-border);
+    padding: 0.25rem;
+    background-color: var(--color-primary-dark);
+    color: var(--color-primary-light);
+    font-weight: 600;
+    text-align: center;
+}
+
+.table td, .table-mini td {
+    padding: 0.25rem;
+    vertical-align: center;
+    border-top: 1px solid var(--color-border);
+}
+
+.table tbody tr:nth-child(odd),
+.table-mini tbody tr:nth-child(odd) {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.table tbody tr:hover,
+.table-mini tbody tr:hover {
+    background-color: rgba(10, 9, 9, 0.25);
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.table-mini {
+    width: 100%;
+    max-width: 780px;
+    margin: 0 auto;
+    margin-bottom: 1rem;
+    color: var(--color-gray-dark);
+    border-collapse: collapse;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 0.75rem;
+    box-shadow: 0 0.5rem 0.5rem rgba(0, 0, 0, 0.75);
+}
+
+.table-fixa {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-fixa th,
+.table-fixa td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0.5rem;
+    border: 1px solid var(--color-border-light);
+}
+
+.table-fixa th {
+    background-color: var(--color-table-header-bg);
+    font-weight: bold;
+}
+
+/* ========== Botôes ========== */
+.btn-group {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.btn {
+    display: inline-block;
+    min-width: 65px;
+    font-weight: 400;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    user-select: none;
+    cursor: pointer;
+    border: 0.1rem solid transparent;
+    padding: 0.1rem 0.7rem;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    border-radius: 0.25rem;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out;
+    margin-right: 0.25rem;
+}
+
+.btn-action {
+    color: var(--color-white);
+    background-color: var(--color-green);
+    border-color: var(--color-green);
+}
+
+.btn-info {
+    color: var(--color-white);
+    background-color: var(--color-blue);
+    border-color: var(--color-blue);
+}
+
+.btn-warning {
+    color: var(--color-white);
+    background-color: var(--color-orange);
+    border-color: var(--color-orange);
+}
+
+.btn-danger {
+    color: var(--color-white);
+    background-color: var(--color-red);
+    border-color: var(--color-red);
+}
+
+.btn:hover {
+    opacity: 0.75;
+}
+
+/* ========== Formulários ========== */
+.form-container,
+.form-container-row,
+.form-mini {
+  width: 100%;
+  max-width: 800px;   /* desktop continua limitado */
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* inputs ocupam toda a largura no mobile */
+.form-group {
+  flex: 1;
+  min-width: 150px;
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    border: 1px solid var(--color-form-border);
+    border-radius: 0.75rem;
+}
+
+.form-container-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid var(--color-form-border);
+    border-radius: 0.75rem;
+}
+
+.form-mini {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    color: var(--color-gray-dark);
+    border-collapse: collapse;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 0.75rem;
+    border: 1px solid var(--color-border);
+    box-shadow: 0 0.5rem 0.5rem rgba(0, 0, 0, 0.75);
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    width: 100%;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.25rem;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    box-sizing: border-box;
+}
+
+.form-group select {
+    padding: 0.25rem;
+}
+
+.form-group span {
+    text-align: center;
+    padding: 0.25rem;
+}
+
+.form-group input {
+    padding: 0.25rem;
+}
+
+legend {
+    background-color: var(--color-gray);
+    color: var(--color-white);
+    text-align: center;
+    border-radius: 0.25rem;
+    padding: 0.25rem 0rem;
+}
+
+.label {
+    display: block;
+    margin-top: 0.25rem;
+    font-weight: bold;
+}
+
+.textArea {
+    width: 100%;
+    min-height: 60px;     /* altura inicial */
+    max-height: 300px;    /* quando passar disso, aparece scroll */
+    padding: 0.5rem;
+    box-sizing: border-box;
+    font: inherit;
+    resize: none;         /* usuário não consegue redimensionar */
+    overflow-y: auto;     /* ativa scroll vertical se precisar */
+}
+
+/* ========== Auxiliares ========== */
+.error-text {
+  color: var(--color-error);
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  display: block;
+  min-height: 1rem; /* reserva espaço para não “pular” layout */
+}
+
+/* ========== Responsivo ========== */
+/* Ajustes para telas menores que 768px (tablets/celulares) */
+@media (max-width: 768px) {
+    .container {
+        margin-top: 1.25rem;
+        padding: 1rem;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+        text-align: center;
+    }
+
+    .form-row {
+        flex-direction: column; /* empilha os inputs */
+        gap: 0.5rem;
+    }
+
+    .form-group {
+        min-width: 100%;
+    }
+
+    .form-container,
+    .form-container-row,
+    .form-mini {
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+    }
+
+    .btn-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+/* Ajustes para telas menores que 480px (celulares pequenos) */
+@media (max-width: 480px) {
+    .modal-content {
+        width: 95%;
+        margin: 30% auto;
+        padding: 1rem;
+    }
+
+    .btn {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.75rem;
+    }
+
+    .table td, .table th {
+        font-size: 0.75rem;
+        padding: 0.25rem;
+    }
+
+    .form-container,
+    .form-container-row,
+    .form-mini {
+        padding: 0.5rem;
+        border: none;
+        box-shadow: none;
+    }
+
+    .form-group input,
+    .form-group select,
+    .textArea {
+        font-size: 0.75rem;
+        padding: 0.5rem;
+    }
+
+    legend {
+        font-size: 1rem;
+        padding: 0.25rem;
+    }
+}
