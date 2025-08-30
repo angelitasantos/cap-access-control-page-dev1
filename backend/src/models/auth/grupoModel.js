@@ -15,25 +15,37 @@ const grupoModel = {
      * 
      * @returns {Promise<Array>} Lista de grupos ativos.
      */
-    async getAll() {
-        // Aguarda até que o banco esteja conectado
-        if (!db.isDbConnected()) {
-            console.error('Banco de dados não está conectado!');
-            throw new Error('Banco de dados não está conectado');
-        }
-        
-        try {
-            const result = await db.pool.query(
-                `SELECT id, descricao, status 
-                FROM grupos 
-                WHERE deletado = false
-                ORDER BY descricao ASC`
-            );
-            return result.rows;
-        } catch (err) {
-            console.error('Erro ao buscar grupos:', err.message);
-            throw err;
-        }
+    async getAll({ page = 1, pageSize = 10, search = '', orderBy = 'id', order = 'ASC' }) {
+        const offset = (page - 1) * pageSize;
+        const searchQuery = `%${search}%`;
+
+        const validColumns = ['id', 'descricao', 'status'];
+        if (!validColumns.includes(orderBy)) orderBy = 'id';
+        order = order.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+
+        const query = `
+            SELECT * FROM grupos
+            WHERE deletado = false
+            AND descricao ILIKE $1
+            ORDER BY ${orderBy} ${order}
+            LIMIT $2 OFFSET $3
+        `;
+        const totalQuery = `
+            SELECT COUNT(*) AS total FROM grupos
+            WHERE deletado = false AND descricao ILIKE $1
+        `;
+
+        const [result, totalResult] = await Promise.all([
+            db.pool.query(query, [searchQuery, pageSize, offset]),
+            db.pool.query(totalQuery, [searchQuery])
+        ]);
+
+        return {
+            data: result.rows,
+            total: parseInt(totalResult.rows[0].total, 10),
+            page,
+            pageSize
+        };
     },
 
     /**
@@ -46,7 +58,7 @@ const grupoModel = {
      * @param {number|null} excludeId - (Opcional) ID a ser desconsiderado na verificação.
      * @returns {Promise<boolean>} True se já existir, false caso contrário.
      */
-    async existsByDescricao (descricao, excludeId = null) {
+    async existsByDescription (descricao, excludeId = null) {
         try {
             let sql = 'SELECT 1 FROM grupos WHERE LOWER(descricao) = LOWER($1)';
             const params = [descricao];
@@ -102,7 +114,7 @@ const grupoModel = {
      * @param {number} id - ID do grupo que deve ser desconsiderado na verificação.
      * @returns {Promise<boolean>} True se já existir outro grupo com a mesma descrição, false caso contrário.
      */
-    async existsByDescricaoExceptId(descricao, id) {
+    async existsByDescriptionExceptId(descricao, id) {
         const result = await db.pool.query(
             `SELECT id FROM grupos 
              WHERE descricao ILIKE $1 AND id <> $2`,
@@ -158,23 +170,47 @@ const grupoModel = {
     },
 
     /**
-         * Lista todos os grupos inativos (deletados).
-         *
-         * Retorna os campos 'id', 'descricao', 'status' e 'deletado'.
+         * Lista grupos inativos (deletados) com paginação, busca e ordenação.
+         * 
+         * @param {Object} params - Parâmetros de paginação, busca e ordenação.
+         * @param {number} params.page - Página atual (default: 1).
+         * @param {number} params.pageSize - Quantidade por página (default: 10).
+         * @param {string} params.search - Texto de busca para filtrar pela descrição.
+         * @param {string} params.orderBy - Coluna para ordenação (id, descricao, status).
+         * @param {string} params.order - Direção da ordenação (ASC ou DESC).
+         * @returns {Promise<Object>} Lista de grupos inativos paginada.
     */
-    async getInativos() {
-        try {
-            const result = await db.pool.query(
-                `SELECT id, descricao, status, deletado
-                FROM grupos
-                WHERE deletado = true
-                ORDER BY descricao ASC`
-            );
-            return result.rows;
-        } catch (err) {
-            console.error('Erro ao buscar grupos inativos:', err.message);
-            throw err;
-        }
+    async getInactive({ page = 1, pageSize = 10, search = '', orderBy = 'id', order = 'ASC' }) {
+        const offset = (page - 1) * pageSize;
+        const searchQuery = `%${search}%`;
+
+        const validColumns = ['id', 'descricao', 'status'];
+        if (!validColumns.includes(orderBy)) orderBy = 'id';
+        order = order.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+
+        const query = `
+            SELECT * FROM grupos
+            WHERE deletado = true
+            AND descricao ILIKE $1
+            ORDER BY ${orderBy} ${order}
+            LIMIT $2 OFFSET $3
+        `;
+        const totalQuery = `
+            SELECT COUNT(*) AS total FROM grupos
+            WHERE deletado = true AND descricao ILIKE $1
+        `;
+
+        const [result, totalResult] = await Promise.all([
+            db.pool.query(query, [searchQuery, pageSize, offset]),
+            db.pool.query(totalQuery, [searchQuery])
+        ]);
+
+        return {
+            data: result.rows,
+            total: parseInt(totalResult.rows[0].total, 10),
+            page,
+            pageSize
+        };
     },
 
     /**

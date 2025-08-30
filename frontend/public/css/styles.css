@@ -54,6 +54,10 @@ h1 {
 	  margin-bottom: 1.25rem;
 }
 
+.text-center {
+    text-align: center;
+}
+
 /* ========== Modal ========== */
 .modal {
     display: none;
@@ -338,16 +342,19 @@ h1 {
     box-sizing: border-box;
 }
 
-.form-group select {
-    padding: 0.25rem;
-}
-
 .form-group span {
     text-align: center;
     padding: 0.25rem;
 }
 
-.form-group input {
+.input-search {
+    width: 400px;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    box-sizing: border-box;
+}
+
+.form-group input, .form-group select, .input-search {
     padding: 0.25rem;
 }
 

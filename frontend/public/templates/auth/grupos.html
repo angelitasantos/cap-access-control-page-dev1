@@ -13,25 +13,22 @@
             <h1>📋 Lista de Grupos</h1>
             <div class="btn-container">
                 <div class="left-btn">
-                    <button class="btn btn-info" onclick="carregarGrupos()">Ativos</button>
-                    <button class="btn btn-warning" onclick="carregarInativos()">Inativos</button>
+                    <button class="btn btn-info" onclick="carregarGrupos(1)">ATIVOS</button>
+                    <button class="btn btn-warning" onclick="carregarInativos(1)">INATIVOS</button>
+                    <input type="text" id="searchInput" class="input-search" placeholder="Buscar grupos..." />
+                    <button id="btnLimparBusca" class="btn btn-danger">LIMPAR</button>
                 </div>
                 <div class="right-btn">
-                    <button class="btn btn-action" id="btnNovoGrupo">+ Novo Grupo</button>
+                    <button class="btn btn-action" id="btnNovoGrupo">+ NOVO GRUPO</button>
                 </div>
             </div>
+
+            <div id="paginacao"></div>
             
             <table border="1" id="table-group" class="table table-fixa table-mini">
-                <thead>
-                    <tr>
-                        <th style="width: 50px;">ID</th>
-                        <th style="min-width: 250px;">Descrição</th>
-                        <th style="width: 70px;">Status</th>
-                        <th style="width: 150px;">Ações</th>
-                    </tr>
-                </thead>
-                <tbody><!-- Linhas inseridas via JS --></tbody>
-            </table>
+                <thead></thead>
+                <tbody></tbody>
+            </table>            
         </section>
 
         <div id="modalGrupo" class="modal">
@@ -46,12 +43,12 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="descricao" class="label">Descrição</label>
-                                <input type="text" id="descricao" required>
+                                <input type="text" id="descricao" autocomplete="OFF">
                             </div>
                         </div>
                         <div class="modal-actions">
-                            <button type="submit" class="btn btn-action">Salvar</button>
-                            <button type="button" class="btn btn-danger" id="cancelarBtnAdd">Cancelar</button>
+                            <button type="submit" class="btn btn-action">SALVAR</button>
+                            <button type="button" class="btn btn-danger" id="cancelarBtnAdd">CANCELAR</button>
                         </div>
                     </div>
                     <div class="modal-footer modal-footer-center">
@@ -74,12 +71,12 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="descricaoEditar">Descrição</label>
-                                <input type="text" id="descricaoEditar" name="descricao" required minlength="3">
+                                <input type="text" id="descricaoEditar" name="descricao" autocomplete="OFF">
                             </div>
                         </div>
                         <div class="modal-actions">
-                            <button type="submit" class="btn btn-action">Salvar Alterações</button>
-                            <button type="button" class="btn btn-danger" id="cancelarBtnEdit">Cancelar</button>
+                            <button type="submit" class="btn btn-action">SALVAR ALTERAÇÕES</button>
+                            <button type="button" class="btn btn-danger" id="cancelarBtnEdit">CANCELAR</button>
                         </div>
                     </div>
                     <div class="modal-footer modal-footer-center">
