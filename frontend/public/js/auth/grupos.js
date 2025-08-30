@@ -1,15 +1,87 @@
 // Defini a URL base da API
 const baseURL = 'http://localhost:3000';
 
+let currentPage = 1;
+let pageSize = 5;
+let currentSearch = '';
+let currentOrderBy = 'id';
+let currentOrder = 'ASC';
+let searchTimeout;
+let modoInativos = false;
+
+document.getElementById('btnLimparBusca').addEventListener('click', () => {
+    const inputBusca = document.getElementById('searchInput');
+    inputBusca.value = '';
+    currentSearch = '';
+    currentPage = 1;
+
+    if (modoInativos) {
+        carregarInativos(1);
+    } else {
+        carregarGrupos(1);
+    }
+});
+
+// Busca com debounce e respeitando o modo atual (ativos/inativos)
+document.querySelector('#searchInput').addEventListener('input', (e) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        currentSearch = e.target.value;
+        currentPage = 1;
+        if (modoInativos) {
+            carregarInativos(1);
+        } else {
+            carregarGrupos(1);
+        }
+    }, 400);
+});
+
+// Cabeçalho com ícones de ordenação
+function renderizarCabecalho() {
+    const thead = document.querySelector('#table-group thead');
+    thead.innerHTML = `
+        <tr>
+            <th style="width: 50px;" data-col="id" class="sortable text-center">ID ${getSortIcon('id')}</th>
+            <th style="min-width: 250px;" data-col="descricao" class="sortable text-center">DESCRICAO ${getSortIcon('descricao')}</th>
+            <th style="width: 70px; "data-col="status" class="sortable text-center">STATUS</th>
+            <th style="width: 170px;">AÇÕES</th>
+        </tr>
+    `;
+
+    thead.querySelectorAll('th[data-col]').forEach(th => {
+        th.addEventListener('click', () => {
+        const col = th.dataset.col;
+        if (currentOrderBy === col) {
+            currentOrder = currentOrder === 'ASC' ? 'DESC' : 'ASC';
+        } else {
+            currentOrderBy = col;
+            currentOrder = 'ASC';
+        }
+        // Recarrega respeitando o modo atual
+        if (modoInativos) carregarInativos(1);
+        else carregarGrupos(1);
+        });
+    });
+}
+
+function getSortIcon(col) {
+    if (currentOrderBy !== col) return '';
+    return currentOrder === 'ASC' ? '▲' : '▼';
+}
+
 /**
  * Carrega os grupos da API e renderiza-os na tabela HTML.
  * 
  * Faz uma requisição GET para '/api/grupos', trata a resposta e
  * atualiza a tabela com os dados retornados.
  */
-async function carregarGrupos() {
+async function carregarGrupos(page = 1) {
     try {
-        const response = await fetch(`${baseURL}/api/grupos`);
+        currentPage = page || 1;
+        modoInativos = false;
+        currentSearch = document.getElementById('searchInput').value;
+    
+        const response = await fetch(`${baseURL}/api/grupos?page=${currentPage}&pageSize=${pageSize}&search=${currentSearch}&orderBy=${currentOrderBy}&order=${currentOrder}`);
         const result = await response.json();
 
         if (!result.success) {
@@ -17,7 +89,9 @@ async function carregarGrupos() {
             return;
         }
 
+        renderizarCabecalho();
         renderizarTabela(result.data);
+        renderizarPaginacao(result.total, result.page || 1, result.pageSize);
 
     } catch (err) {
         console.error('Erro no fetch de grupos:', err.message);
@@ -33,19 +107,56 @@ function renderizarTabela(grupos) {
     const tbody = document.querySelector('#table-group tbody');
     tbody.innerHTML = '';
 
+    if (!grupos || grupos.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td colspan="4" class="text-center">Nenhum Registro Encontrado!</td>
+        `;
+        tbody.appendChild(row);
+        return;
+    }
+
     grupos.forEach((grupo) => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${grupo.id}</td>
+            <td class="text-center">${grupo.id}</td>
             <td>${grupo.descricao}</td>
-            <td>${grupo.status}</td>
-            <td>
-                <button class='btn btn-warning' onclick='abrirModalEditar(${JSON.stringify(grupo)})'>Editar</button>
-                <button class='btn btn-danger' onclick='inativarGrupo(${grupo.id})'>Inativar</button>
+            <td class="text-center">${grupo.status}</td>
+            <td class="text-center">
+                <button class='btn btn-warning' onclick='abrirModalEditar(${JSON.stringify(grupo)})'>EDITAR</button>
+                <button class='btn btn-danger' onclick='inativarGrupo(${grupo.id})'>INATIVAR</button>
             </td>
         `;
         tbody.appendChild(row);
     });
+}
+
+function renderizarPaginacao(total, page = 1, pageSize) {
+    const paginacaoDiv = document.getElementById('paginacao');
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+
+    paginacaoDiv.innerHTML = '';
+    for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+
+        if (page && i === page) {
+            btn.classList.add('active');
+        }
+
+        btn.onclick = () => (modoInativos ? carregarInativos(i) : carregarGrupos(i));
+        paginacaoDiv.appendChild(btn);
+    }
+}
+
+function ordenar(campo) {
+    if (currentOrderBy === campo) {
+        currentOrder = currentOrder === 'ASC' ? 'DESC' : 'ASC';
+    } else {
+        currentOrderBy = campo;
+        currentOrder = 'ASC';
+    }
+    carregarGrupos(1);
 }
 
 const modalGrupo = document.querySelector('#modalGrupo');
@@ -202,9 +313,13 @@ async function inativarGrupo(id) {
 }
 
 // Carregar grupos inativos
-async function carregarInativos() {
+async function carregarInativos(page = 1) {
     try {
-        const response = await fetch(`${baseURL}/api/grupos/inativos`);
+        currentPage = page || 1;
+        modoInativos = true;
+        currentSearch = document.getElementById('searchInput').value;
+
+        const response = await fetch(`${baseURL}/api/grupos/inativos?page=${currentPage}&pageSize=${pageSize}&search=${currentSearch}&orderBy=${currentOrderBy}&order=${currentOrder}`);
         const result = await response.json();
 
         if (!result.success) {
@@ -212,7 +327,9 @@ async function carregarInativos() {
             return;
         }
 
+        renderizarCabecalho();
         renderizarTabelaInativos(result.data);
+        renderizarPaginacao(result.total, result.page || 1, result.pageSize);
 
     } catch (err) {
         console.error('Erro no fetch de inativos:', err.message);
@@ -223,14 +340,23 @@ function renderizarTabelaInativos(grupos) {
     const tbody = document.querySelector('#table-group tbody');
     tbody.innerHTML = '';
 
+    if (!grupos || grupos.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td colspan="4" class="text-center">Nenhum Registro Encontrado!</td>
+        `;
+        tbody.appendChild(row);
+        return;
+    }
+
     grupos.forEach((grupo) => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${grupo.id}</td>
+            <td class="text-center">${grupo.id}</td>
             <td>${grupo.descricao}</td>
-            <td>${grupo.status}</td>
-            <td>
-                <button class='btn btn-warning' onclick='restaurarGrupo(${grupo.id})'>Restaurar</button>
+            <td class="text-center">${grupo.status}</td>
+            <td class="text-center">
+                <button class='btn btn-warning' onclick='restaurarGrupo(${grupo.id})'>RESTAURAR</button>
             </td>
         `;
         tbody.appendChild(row);
