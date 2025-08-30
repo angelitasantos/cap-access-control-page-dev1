@@ -144,6 +144,42 @@ const grupoController = {
             console.error('Erro ao inativar grupo:', err);
             return res.status(500).json({ success: false, message: 'Erro ao inativar grupo!' });
         }
+    },
+
+    /**
+         * Lista grupos inativos.
+    */
+    async listarInativos(req, res) {
+        try {
+            const grupos = await grupoModel.getInativos();
+            return res.status(200).json({ success: true, data: grupos });
+        } catch (err) {
+            console.error('Erro ao listar grupos inativos:', err);
+            return res.status(500).json({ success: false, message: 'Erro ao listar grupos inativos!' });
+        }
+    },
+
+    /**
+     * Restaura grupo inativado.
+     */
+    async restaurar(req, res) {
+        try {
+            const { id } = req.params;
+            const restaurado = await grupoModel.restore(id);
+
+            if (!restaurado) {
+                return res.status(404).json({ success: false, message: 'Grupo não encontrado ou já está ativo!' });
+            }
+
+            return res.status(200).json({
+                success: true,
+                message: 'Grupo restaurado com sucesso!',
+                data: restaurado
+            });
+        } catch (err) {
+            console.error('Erro ao restaurar grupo:', err);
+            return res.status(500).json({ success: false, message: 'Erro ao restaurar grupo!' });
+        }
     }
 
 }

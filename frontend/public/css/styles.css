@@ -210,6 +210,21 @@ h1 {
     justify-content: flex-end;
 }
 
+.btn-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.left-btn button {
+    margin-right: 0.5rem;
+}
+
+.right-btn button {
+    margin-left: 0.5rem;
+}
+
 .btn {
     display: inline-block;
     min-width: 65px;

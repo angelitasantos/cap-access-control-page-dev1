@@ -119,15 +119,15 @@ formGrupo.addEventListener('submit', async (e) => {
     try {
         btnSubmit.disabled = true;
 
-        const res = await fetch(`${baseURL}/api/grupos`, {
+        const response = await fetch(`${baseURL}/api/grupos`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ descricao })
         });
 
-        const data = await res.json();
+        const data = await response.json();
 
-        if (res.ok && data.success) {
+        if (response.ok && data.success) {
             fecharModal(modalGrupo, formGrupo)
             carregarGrupos();
         } else {
@@ -158,15 +158,15 @@ formEditarGrupo.addEventListener('submit', async (e) => {
     }
 
     try {
-        const res = await fetch(`${baseURL}/api/grupos/${grupoEditandoId}`, {
+        const response = await fetch(`${baseURL}/api/grupos/${grupoEditandoId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ descricao })
         });
 
-        const data = await res.json();
+        const data = await response.json();
 
-        if (res.ok && data.success) {
+        if (response.ok && data.success) {
             fecharModal(modalEditar, formEditarGrupo);
             carregarGrupos();
         } else {
@@ -183,22 +183,80 @@ async function inativarGrupo(id) {
     if (!confirm('Tem certeza que deseja inativar este grupo?')) return;
 
     try {
-        const res = await fetch(`${baseURL}/api/grupos/${id}`, {
+        const response = await fetch(`${baseURL}/api/grupos/${id}`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' }
         });
 
-        const data = await res.json();
+        const data = await response.json();
 
-        if (res.ok) {
+        if (response.ok) {
             alert('Grupo inativado com sucesso!');
             carregarGrupos();
         } else {
-            alert(data.message || 'Erro ao inativar grupo!');
+            console.error(data.message || 'Erro ao inativar grupo!');
         }
     } catch (err) {
-        console.error(err);
-        alert('Erro no servidor ao inativar grupo!');
+        console.error('Erro no servidor ao inativar grupo:', err.message);
+    }
+}
+
+// Carregar grupos inativos
+async function carregarInativos() {
+    try {
+        const response = await fetch(`${baseURL}/api/grupos/inativos`);
+        const result = await response.json();
+
+        if (!result.success) {
+            console.error('Erro ao carregar grupos inativos:', result.message);
+            return;
+        }
+
+        renderizarTabelaInativos(result.data);
+
+    } catch (err) {
+        console.error('Erro no fetch de inativos:', err.message);
+    }
+}
+
+function renderizarTabelaInativos(grupos) {
+    const tbody = document.querySelector('#table-group tbody');
+    tbody.innerHTML = '';
+
+    grupos.forEach((grupo) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${grupo.id}</td>
+            <td>${grupo.descricao}</td>
+            <td>${grupo.status}</td>
+            <td>
+                <button class='btn btn-warning' onclick='restaurarGrupo(${grupo.id})'>Restaurar</button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Restaurar grupo
+async function restaurarGrupo(id) {
+    if (!confirm('Deseja restaurar este grupo?')) return;
+
+    try {
+        const response = await fetch(`${baseURL}/api/grupos/${id}/restore`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert('Grupo restaurado com sucesso!');
+            carregarInativos();
+        } else {
+            console.error(data.message || 'Erro ao restaurar grupo!');
+        }
+    } catch (err) {
+        console.error('Erro no fetch de inativos:', err.message);
     }
 }
 
