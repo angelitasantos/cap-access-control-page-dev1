@@ -13,11 +13,18 @@ const grupoController = {
      */
     async listar(req, res) {
         try {
-            const grupos = await grupoModel.getAll();
-            res.status(200).json({ success: true, data: grupos });
+            const { page, pageSize, search, orderBy, order } = req.query;
+            const grupos = await grupoModel.getAll({
+                page: parseInt(page) || 1,
+                pageSize: parseInt(pageSize) || 10,
+                search: search || '',
+                orderBy: orderBy || 'id',
+                order: order || 'ASC'
+            });
+            return res.json({ success: true, ...grupos });
         } catch (err) {
             console.error('Erro ao listar grupos:', err);
-            res.status(500).json({ success: false, message: 'Erro ao listar grupos!' });
+            return res.status(500).json({ success: false, message: 'Erro ao listar grupos!' });
         }
     },
 
@@ -43,7 +50,7 @@ const grupoController = {
             }
 
             // valida duplicidade antes do insert
-            const jaExiste = await grupoModel.existsByDescricao(descricao);
+            const jaExiste = await grupoModel.existsByDescription(descricao);
             if (jaExiste) {
                 return res.status(400).json({ success: false, message: 'Já existe um grupo com essa descrição!' });
             }
@@ -88,7 +95,7 @@ const grupoController = {
             }
             descricao = descricao.trim();
 
-            const jaExiste = await grupoModel.existsByDescricaoExceptId(descricao, id);
+            const jaExiste = await grupoModel.existsByDescriptionExceptId(descricao, id);
             if (jaExiste) {
                 return res.status(400).json({ success: false, message: 'Já existe um grupo com essa descrição!' });
             }
@@ -147,12 +154,19 @@ const grupoController = {
     },
 
     /**
-         * Lista grupos inativos.
+         * Lista grupos inativos (deletados) com paginação, busca e ordenação.
     */
     async listarInativos(req, res) {
         try {
-            const grupos = await grupoModel.getInativos();
-            return res.status(200).json({ success: true, data: grupos });
+            const { page, pageSize, search, orderBy, order } = req.query;
+            const grupos = await grupoModel.getInactive({
+                page: parseInt(page) || 1,
+                pageSize: parseInt(pageSize) || 10,
+                search: search || '',
+                orderBy: orderBy || 'id',
+                order: order || 'ASC'
+            });
+            return res.status(200).json({ success: true, ...grupos });
         } catch (err) {
             console.error('Erro ao listar grupos inativos:', err);
             return res.status(500).json({ success: false, message: 'Erro ao listar grupos inativos!' });
