@@ -155,6 +155,42 @@ const grupoModel = {
             [id]
         );
         return result.rows[0];
+    },
+
+    /**
+         * Lista todos os grupos inativos (deletados).
+         *
+         * Retorna os campos 'id', 'descricao', 'status' e 'deletado'.
+    */
+    async getInativos() {
+        try {
+            const result = await db.pool.query(
+                `SELECT id, descricao, status, deletado
+                FROM grupos
+                WHERE deletado = true
+                ORDER BY descricao ASC`
+            );
+            return result.rows;
+        } catch (err) {
+            console.error('Erro ao buscar grupos inativos:', err.message);
+            throw err;
+        }
+    },
+
+    /**
+         * Restaura um grupo inativo (soft delete reverso).
+         * 
+         * Define 'deletado = false' e 'status = ATIVO'.
+    */
+    async restore(id) {
+        const result = await db.pool.query(
+            `UPDATE grupos
+            SET deletado = false, status = 'ATIVO'
+            WHERE id = $1 AND deletado = true
+            RETURNING id, descricao, status, deletado`,
+            [id]
+        );
+        return result.rows[0];
     }
 
 }
