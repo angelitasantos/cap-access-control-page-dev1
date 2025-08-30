@@ -84,5 +84,9 @@ router.put('/:id', grupoController.atualizar);
    * - 500: JSON com mensagem de erro interno.
  */
 router.delete('/:id', grupoController.deletar);
+// GET inativos
+router.get('/inativos', grupoController.listarInativos);
+// PATCH restore
+router.patch('/:id/restore', grupoController.restaurar);
 
 module.exports = router;

@@ -11,15 +11,22 @@
     <main class="container">
         <section>
             <h1>📋 Lista de Grupos</h1>
-            <button class="btn btn-action" id="btnNovoGrupo">
-                + Novo Grupo
-            </button>
+            <div class="btn-container">
+                <div class="left-btn">
+                    <button class="btn btn-info" onclick="carregarGrupos()">Ativos</button>
+                    <button class="btn btn-warning" onclick="carregarInativos()">Inativos</button>
+                </div>
+                <div class="right-btn">
+                    <button class="btn btn-action" id="btnNovoGrupo">+ Novo Grupo</button>
+                </div>
+            </div>
+            
             <table border="1" id="table-group" class="table table-fixa table-mini">
                 <thead>
                     <tr>
                         <th style="width: 50px;">ID</th>
                         <th style="min-width: 250px;">Descrição</th>
-                        <th style="width: 50px;">Status</th>
+                        <th style="width: 70px;">Status</th>
                         <th style="width: 150px;">Ações</th>
                     </tr>
                 </thead>
