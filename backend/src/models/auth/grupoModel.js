@@ -35,17 +35,40 @@ const grupoModel = {
             WHERE deletado = false AND descricao ILIKE $1
         `;
 
-        const [result, totalResult] = await Promise.all([
+        // métricas gerais
+        const metricsQuery = `
+            SELECT 
+                COUNT(*)::int AS total,
+                SUM(CASE WHEN deletado = false THEN 1 ELSE 0 END)::int AS ativos,
+                SUM(CASE WHEN deletado = true THEN 1 ELSE 0 END)::int AS inativos
+            FROM grupos
+        `;
+
+        const [result, totalResult, metricsResult] = await Promise.all([
             db.pool.query(query, [searchQuery, pageSize, offset]),
-            db.pool.query(totalQuery, [searchQuery])
+            db.pool.query(totalQuery, [searchQuery]),
+            db.pool.query(metricsQuery)
         ]);
 
         return {
             data: result.rows,
             total: parseInt(totalResult.rows[0].total, 10),
             page,
-            pageSize
+            pageSize,
+            metrics: metricsResult.rows[0]   // 👉 { total, ativos, inativos }
         };
+    },
+
+    async getMetrics() {
+        const sql = `
+            SELECT 
+                COUNT(*)::int AS total,
+                SUM(CASE WHEN deletado = false THEN 1 ELSE 0 END)::int AS ativos,
+                SUM(CASE WHEN deletado = true THEN 1 ELSE 0 END)::int AS inativos
+            FROM grupos
+        `;
+        const { rows } = await db.pool.query(sql);
+        return rows[0];
     },
 
     /**

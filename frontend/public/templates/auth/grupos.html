@@ -10,7 +10,7 @@
 
     <main class="container">
         <section>
-            <h1>📋 Lista de Grupos</h1>
+            <h1 id="tituloGrupos"></h1>
             <div class="btn-container">
                 <div class="left-btn">
                     <button class="btn btn-info" onclick="carregarGrupos(1)">ATIVOS</button>
@@ -24,6 +24,12 @@
             </div>
 
             <div id="paginacao"></div>
+
+            <div class="metrics-container">
+                <span>Total: <strong id="totalRegistros">0</strong></span>
+                <span>Ativos: <strong id="totalAtivos">0</strong></span>
+                <span>Inativos: <strong id="totalInativos">0</strong></span>
+            </div>
             
             <table border="1" id="table-group" class="table table-fixa table-mini">
                 <thead></thead>
