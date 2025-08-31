@@ -69,6 +69,13 @@ function getSortIcon(col) {
     return currentOrder === 'ASC' ? '▲' : '▼';
 }
 
+function atualizarMetricas(metrics) {
+    if (!metrics) return;
+    document.getElementById('totalRegistros').textContent = `Total: ${metrics.total || 0}`;
+    document.getElementById('totalAtivos').textContent = `Ativos: ${metrics.ativos || 0}`;
+    document.getElementById('totalInativos').textContent = `Inativos: ${metrics.inativos || 0}`;
+}
+
 /**
  * Carrega os grupos da API e renderiza-os na tabela HTML.
  * 
@@ -79,6 +86,7 @@ async function carregarGrupos(page = 1) {
     try {
         currentPage = page || 1;
         modoInativos = false;
+        document.getElementById('tituloGrupos').textContent = '📋 Lista de Grupos Ativos';
         currentSearch = document.getElementById('searchInput').value;
     
         const response = await fetch(`${baseURL}/api/grupos?page=${currentPage}&pageSize=${pageSize}&search=${currentSearch}&orderBy=${currentOrderBy}&order=${currentOrder}`);
@@ -89,10 +97,10 @@ async function carregarGrupos(page = 1) {
             return;
         }
 
+        atualizarMetricas(result.metrics);
         renderizarCabecalho();
         renderizarTabela(result.data);
         renderizarPaginacao(result.total, result.page || 1, result.pageSize);
-
     } catch (err) {
         console.error('Erro no fetch de grupos:', err.message);
     }
@@ -303,7 +311,8 @@ async function inativarGrupo(id) {
 
         if (response.ok) {
             alert('Grupo inativado com sucesso!');
-            carregarGrupos();
+            if (modoInativos) carregarInativos(currentPage);
+            else carregarGrupos(currentPage);
         } else {
             console.error(data.message || 'Erro ao inativar grupo!');
         }
@@ -317,6 +326,7 @@ async function carregarInativos(page = 1) {
     try {
         currentPage = page || 1;
         modoInativos = true;
+        document.getElementById('tituloGrupos').textContent = '📋 Lista de Grupos Inativos';
         currentSearch = document.getElementById('searchInput').value;
 
         const response = await fetch(`${baseURL}/api/grupos/inativos?page=${currentPage}&pageSize=${pageSize}&search=${currentSearch}&orderBy=${currentOrderBy}&order=${currentOrder}`);
@@ -327,10 +337,10 @@ async function carregarInativos(page = 1) {
             return;
         }
 
+        atualizarMetricas(result.metrics);
         renderizarCabecalho();
         renderizarTabelaInativos(result.data);
         renderizarPaginacao(result.total, result.page || 1, result.pageSize);
-
     } catch (err) {
         console.error('Erro no fetch de inativos:', err.message);
     }
@@ -377,7 +387,14 @@ async function restaurarGrupo(id) {
 
         if (response.ok) {
             alert('Grupo restaurado com sucesso!');
-            carregarInativos();
+            if (modoInativos) {
+                carregarInativos(currentPage);
+            } else {
+                carregarGrupos(currentPage);
+            }
+
+            carregarGrupos(currentPage);
+            carregarInativos(1);
         } else {
             console.error(data.message || 'Erro ao restaurar grupo!');
         }
